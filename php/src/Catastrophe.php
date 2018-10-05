@@ -18,9 +18,9 @@ class Catastrophe
 
     }
 
-    public function getEvent()
+    public function getEvent($AnSimu)
     {
-        if ($this->_nbAn < 50) {
+        if ($this->_nbAn <= 50) {
             $rdNbCata = mt_rand(0, 1);
             $maxAn = 50;
         } elseif ($this->_nbAn <= 500) {
@@ -42,7 +42,7 @@ class Catastrophe
             $this->_event[] = [
                 'idev' => intval($res[0]),
                 'ev' => $res[1],
-                'an' => mt_rand(1, $maxAn),
+                'an' => mt_rand(1, $AnSimu),
             ];
         }
         return $this->_event;

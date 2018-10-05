@@ -42,7 +42,7 @@ class Partie
     }
     public function getDataClient($idPart)
     {
-        $req = $this->_coBDD->prepare("SELECT DISTINCT an_cata.id_ville, nb_an, tx_mor, tx_nat
+        $req = $this->_coBDD->prepare("SELECT ini_pop, an_cata.id_ville, nb_an, tx_mor, tx_nat
         FROM an_cata 
         INNER JOIN ville ON an_cata.id_ville = ville.id_ville 
         INNER JOIN partie ON an_cata.id_part = partie.id_part 
@@ -50,28 +50,19 @@ class Partie
         $req->bindParam(1, $idPart);
         $req->execute();
         $res = $req->fetchAll();
+        $i = 1;
         foreach ($res as $val) {
             $idVille = intval($val['id_ville']);
             $idPartie = intval($idPart);
             $query = $this->_coBDD->prepare("SELECT nom_catat, date_ancata
             FROM an_cata
             INNER JOIN cata ON an_cata.id_catat = cata.id_catat
-            WHERE id_ville = ? AND id_part = ? ");
+            WHERE id_ville = ? AND id_part = ?
+            ORDER BY date_ancata ");
             $query->bindParam(1, $idVille);
             $query->bindParam(2, $idPartie);
             $query->execute();
             $response = $query->fetchAll();
-            $taille = count($response);
-            while ($taille > 0) {
-                $taille--;
-                for ($i = 0; $i < $taille; $i++) {
-                    if (intval($response[$i]['date_ancata']) > intval($response[$i + 1]['date_ancata'])) {
-                        $memories = $response[$i];
-                        $response[$i] = $response[$i + 1];
-                        $response[$i + 1] = $memories;
-                    }
-                }
-            }
             $arr = [];
             foreach ($response as $value) {
                 $arr[] = [
@@ -80,15 +71,15 @@ class Partie
                 ];
             }
             $this->_event[] = [
-                "ville" => [
-                    "idCity" => intval($val['id_ville']),
+                    "city" => 'ville' . $i . '',
+                    "pop"=>intval($val['ini_pop']),
                     "tauxNat" => floatval($val['tx_nat']),
                     "tauxMort" => floatval($val['tx_mor']),
                     "nbAn" => intval($val['nb_an']),
                     "events" => $arr
-                ],
             ];
+            $i++;
         }
-        return json_encode($this->_event);
+        return var_dump($this->_event);
     }
 }
