@@ -1,13 +1,12 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+require 'Autoloader.php';
+use City\Autoloader;
+Autoloader::register(); 
 
-require "vendor/autoload.php";
-
-use City\Db\Bdd;
-use City\Catastrophes\Catastrophe;
-use City\Part\Partie;
-use City\Villes\Ville;
+use City\Bdd;
+use City\Catastrophe;
+use City\Partie;
+use City\Ville;
 
 
 $arrVilleAn = json_decode($_POST['valVilleAn']);
@@ -20,13 +19,14 @@ foreach ($varParamVille as $valParam) {
     $Cata = new Catastrophe($arrVilleAn[1]);
     $ville = new Ville($valParam[2], $valParam[1], $valParam[0]);
     $registCity = $ville->getRegisterCity();
-    echo $registerCity;
     $event = $Cata->getEvent($arrVilleAn[1]);
     $ville->setRegisterEvent($registCity, $idPart, $event);
     $i++;
 }
 if ($i == count($varParamVille))
-    $partie->getDataClient($idPart);
+    echo $partie->getDataClient($idPart);
+
+
 
 
 

@@ -1,7 +1,6 @@
 <?php
-namespace City\Catastrophes;
-
-use City\Db\Bdd;
+namespace City;
+use City\Bdd;
 
 class Catastrophe
 {

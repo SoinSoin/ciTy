@@ -1,7 +1,7 @@
 <?php
-namespace City\Part;
+namespace City;
 
-use City\Db\Bdd;
+use City\Bdd;
 
 
 class Partie
@@ -17,7 +17,7 @@ class Partie
         $bdd = new Bdd();
         $this->_coBDD = $bdd->getConnection();
         $this->_nbAn = 30;
-        $this->_event = [];
+        $this->_event;
         $this->_nbAn = $nbAn;
     }
 
@@ -42,11 +42,11 @@ class Partie
     }
     public function getDataClient($idPart)
     {
-        $req = $this->_coBDD->prepare("SELECT ini_pop, an_cata.id_ville, nb_an, tx_mor, tx_nat
+        $req = $this->_coBDD->prepare("SELECT DISTINCT ini_pop, an_cata.id_ville, nb_an, tx_mor, tx_nat
         FROM an_cata 
         INNER JOIN ville ON an_cata.id_ville = ville.id_ville 
         INNER JOIN partie ON an_cata.id_part = partie.id_part 
-        WHERE partie.id_part = ?  ");
+        WHERE an_cata.id_part = ?  ");
         $req->bindParam(1, $idPart);
         $req->execute();
         $res = $req->fetchAll();
@@ -70,16 +70,62 @@ class Partie
                     "event" => $value['nom_catat'],
                 ];
             }
-            $this->_event[] = [
+            $cities[] = [
                     "city" => 'ville' . $i . '',
+                    'nbAn'=> intval($val['nb_an']),
                     "pop"=>intval($val['ini_pop']),
                     "tauxNat" => floatval($val['tx_nat']),
                     "tauxMort" => floatval($val['tx_mor']),
-                    "nbAn" => intval($val['nb_an']),
                     "events" => $arr
             ];
             $i++;
         }
-        return var_dump($this->_event);
+        $this->_event = [
+            'nbAn'=> intval($val['nb_an']),
+            'ville'=>$cities,
+            'trName'=> [
+                'nbAn'=>"Nombre d'année de simulation",
+                "pop"=>'Population initiale',
+                "tauxNat" => 'Taux de natalité',
+                "tauxMort" =>'Taux de mortalité',
+                "events" => 'Catastophes'
+                ]
+            ];
+            $this->toCSV($this->_event);
+        return json_encode($this->_event,JSON_UNESCAPED_UNICODE);
+    }
+
+    public function toCSV($arrCSV){
+        $fp = fopen('../partie.csv', 'wb');
+        $arrGlobal = [];
+        $arrValue = [];
+        $arrEevent='';
+        foreach($arrCSV['trName'] as $nameCol ){
+            $arrValue[] = $nameCol;
+        }
+        array_unshift($arrValue,'ville');
+        $arrGlobal[] = $arrValue;
+        $arrValue = [];
+        foreach($arrCSV['ville'] as $val){
+            foreach ($val as $value){
+                if (gettype($value)=='array'){
+                    foreach($value as $event){
+                        $arrEevent .= $event['date'].':'.$event['event'].'/'; 
+                    }
+                    $arrValue[] = $arrEevent;
+                    $arrEevent='';
+                }else{
+                    $arrValue[] = strval($value);
+                }
+            }
+            $arrGlobal[] = $arrValue;
+            $arrValue=[];
+        }
+        
+        foreach($arrGlobal as $global){
+            fputcsv($fp,$global,";");
+
+        }
+        fclose($fp);
     }
 }

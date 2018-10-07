@@ -1,7 +1,7 @@
 <?php
-namespace City\Villes;
+namespace City;
 
-use City\Db\Bdd;
+use City\Bdd;
 
 class Ville
 {
@@ -61,6 +61,14 @@ class Ville
     }
     public function setRegisterEvent($idCity, $idPartie, $Event)
     {
+        if (count($Event)==0){
+            $Eventretry = intval(7);
+            $req = $this->_coBDD->prepare('INSERT INTO  an_cata(id_catat, id_part, id_ville) VALUES ( ?, ?,?)');
+            $req->bindParam(1,$Eventretry);
+            $req->bindParam(2, $idPartie);
+            $req->bindParam(3, $idCity);
+            $req->execute();
+        }
         foreach ($Event as $valEvent) {
             $req = $this->_coBDD->prepare('INSERT INTO  an_cata(date_ancata, id_catat, id_part, id_ville) VALUES ( ? , ? , ?, ?)');
             $req->bindParam(1, $valEvent['an']);

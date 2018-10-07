@@ -1,0 +1,4 @@
+ville;"Nombre d'année de simulation";"Population initiale";"Taux de natalité";"Taux de mortalité";Catastophes
+ville1;84;680;0.08;0.06;41:eau/57:guerre/65:terre/
+ville2;84;798;0.026;0.017;57:guerre/
+ville3;84;618;0.07;0.012;51:epidemie/60:eau/63:terre/68:guerre/

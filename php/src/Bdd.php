@@ -1,6 +1,5 @@
 <?php
-namespace City\Db;
-
+namespace City;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 class Bdd
